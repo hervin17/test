@@ -1,0 +1,40 @@
+---
+# tasks file for apache
+
+- name: install apache2
+  apt: name={{ item }} state=present 
+  with_items:
+    - apache2
+    - libpcre3-dev
+  
+
+- name: activer le module apache rewrite
+  apache2_module: name=rewrite state=present
+  notify: restart apache
+
+- name: creation du virtual host
+  template:
+    src: "test.php.j2"
+    dest: "/etc/apache2/sites-available/{{ domain }}.dev.conf"
+    owner: root
+    group: root
+    mode : 0644
+  notify: restart apache
+
+#- name: lien symbolique
+#  file:
+#    src: "/etc/apache2/sites-available/{{ domain }}.dev.conf"
+#    dest: "/etc/apache2/sites-enabled/{{ domain }}.dev.conf"
+
+- name: effacer le fichier par  defaut de apache
+  file: 
+    path: "/etc/apache2/sites-enabled/000-default.conf"
+    state: absent
+  notify: restart apache
+
+- name: depo du fuchier sur le serveur
+  git:
+    repo: https://github.com/hervin17/test
+    dest: "{{ serv_path }}"
+  notify: restart apache
+  tags: deploi1

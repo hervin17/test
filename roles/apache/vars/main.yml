@@ -1,0 +1,7 @@
+---
+# vars file for apache
+
+serv_path: "/var/www/testphp"
+domain: "testphp"
+site_name: "testphp"
+
